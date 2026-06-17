@@ -1,0 +1,16 @@
+:root {
+  --bg-page: #eef2f6;
+  --bg-panel: #ffffff;
+  --bg-muted: #f7f9fb;
+  --border: #d6dde7;
+  --text-primary: #1f2937;
+  --text-secondary: #667085;
+  --accent: #2563eb;
+  --accent-dark: #1e40af;
+  --compliant: #15803d;
+  --low: #d8a20d;
+  --medium: #c76a00;
+  --high: #c2410c;
+  --critical: #991b1b;
+  --focus: #0f766e;
+}

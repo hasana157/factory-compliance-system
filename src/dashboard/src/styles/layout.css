@@ -1,0 +1,80 @@
+.app-shell {
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.topbar h1,
+.panel h2,
+.timeline-item h3 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.topbar h1 {
+  font-size: 24px;
+}
+
+.subtle {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.topbar-metrics,
+.topbar-actions,
+.button-row,
+.tabs,
+.filter-bar,
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tabs {
+  margin: 14px 0;
+}
+
+.view-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.full-panel {
+  min-height: 560px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 900px) {
+  .topbar,
+  .view-grid {
+    grid-template-columns: 1fr;
+  }
+}

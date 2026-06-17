@@ -1,0 +1,336 @@
+COMPLETE FOLDER STRUCTURE
+========================
+
+factory-compliance-system/
+│
+├── 📄 README.md                           [START HERE: Entry point for evaluators]
+├── 📄 ARCHITECTURE.md                     [System design and module interaction diagram]
+├── 📄 POLICY_EXTRACTION.md                [Detailed explanation of how you parsed compliance policy]
+├── 📄 API_ENDPOINTS.md                    [FastAPI routes documentation]
+├── 📄 LIMITATIONS.md                      [Honest assessment of known issues and trade-offs]
+├── 📄 requirements.txt                    [Python dependencies]
+├── 📄 package.json                        [Frontend dependencies]
+├── 📄 compliance_policy.pdf               [Copy of the provided policy document]
+├── .gitignore                             [Git ignore file]
+├── .env.example                           [Environment variables template]
+│
+├── 🗂️ data/                               [Video dataset directory (downloaded from Kaggle)]
+│   ├── train/
+│   │   ├── Safe_Walkway/                  [Safe behavior videos]
+│   │   ├── Safe_Walkway_Violation/        [Unsafe: person outside green zone]
+│   │   ├── Authorized_Intervention/       [Safe: person with green vest working on equipment]
+│   │   ├── Unauthorized_Intervention/     [Unsafe: person without green vest on equipment]
+│   │   ├── Closed_Panel_Cover/            [Safe: electrical panel fully closed]
+│   │   ├── Opened_Panel_Cover/            [Unsafe: electrical panel left open]
+│   │   ├── Safe_Carrying/                 [Safe: forklift carrying ≤2 blocks]
+│   │   └── Carrying_Overload_with_Forklift/ [Unsafe: forklift carrying ≥3 blocks]
+│   │
+│   └── test/
+│       ├── Safe_Walkway/
+│       ├── Safe_Walkway_Violation/
+│       ├── Authorized_Intervention/
+│       ├── Unauthorized_Intervention/
+│       ├── Closed_Panel_Cover/
+│       ├── Opened_Panel_Cover/
+│       ├── Safe_Carrying/
+│       └── Carrying_Overload_with_Forklift/
+│
+├── 🔧 src/                                [Source code directory]
+│   │
+│   ├── 📁 detection/                      [MODULE 1: Detection Engine]
+│   │   ├── __init__.py
+│   │   ├── detector.py                    [Main detection class: load model, process video]
+│   │   ├── models.py                      [YOLOv8 and MediaPipe wrappers]
+│   │   ├── utils.py                       [Helper functions: frame extraction, preprocessing]
+│   │   ├── config.py                      [Detection configuration: thresholds, model paths]
+│   │   └── constants.py                   [Behavior class mappings, zone definitions]
+│   │
+│   ├── 📁 severity/                       [MODULE 2: Severity Categorization Matrix]
+│   │   ├── __init__.py
+│   │   ├── classifier.py                  [Main classifier: assign LOW/MED/HIGH/CRIT]
+│   │   ├── context_analyzer.py            [Analyze frame context for escalation]
+│   │   ├── rules.json                     [Severity mapping rules derived from policy]
+│   │   └── utils.py                       [Helper functions for severity logic]
+│   │
+│   ├── 📁 escalation/                     [MODULE 3: Escalation Pipeline]
+│   │   ├── __init__.py
+│   │   ├── router.py                      [Route violations to correct channels]
+│   │   ├── alert_manager.py               [Manage real-time alerts for HIGH/CRIT]
+│   │   ├── websocket_handler.py           [WebSocket connection handler]
+│   │   ├── notification_queue.py          [Event queue for alerts]
+│   │   └── db_logger.py                   [Database logging for LOW/MED violations]
+│   │
+│   ├── 📁 reports/                        [MODULE 4: Automated Report Generation]
+│   │   ├── __init__.py
+│   │   ├── generator.py                   [Auto-generate compliance records]
+│   │   ├── schemas.py                     [Pydantic models: ComplianceReport]
+│   │   ├── database.py                    [SQLite setup, queries, ORM]
+│   │   ├── export.py                      [CSV and JSON export functionality]
+│   │   └── utils.py                       [Helper functions]
+│   │
+│   ├── 📁 dashboard/                      [MODULE 5: Operations Dashboard]
+│   │   ├── public/
+│   │   │   ├── index.html                 [React entry point]
+│   │   │   └── favicon.ico
+│   │   │
+│   │   ├── src/
+│   │   │   ├── App.tsx                    [Main React component]
+│   │   │   ├── index.tsx                  [React DOM render]
+│   │   │   ├── App.css                    [Global styles]
+│   │   │   │
+│   │   │   ├── components/
+│   │   │   │   ├── LiveFeedMonitor.tsx    [View A: Live video with detection overlays]
+│   │   │   │   ├── AlertTimeline.tsx      [View B: Real-time violation stream]
+│   │   │   │   ├── HistoricalLog.tsx      [View C: Searchable historical records]
+│   │   │   │   ├── AlertNotification.tsx  [Flash banner for HIGH/CRIT alerts]
+│   │   │   │   ├── FilterBar.tsx          [Date range, severity, behavior filters]
+│   │   │   │   ├── ExportButton.tsx       [Download CSV/JSON]
+│   │   │   │   ├── Navbar.tsx             [Header navigation]
+│   │   │   │   └── Sidebar.tsx            [Navigation menu]
+│   │   │   │
+│   │   │   ├── hooks/
+│   │   │   │   ├── useWebSocket.ts        [Custom hook: real-time alert listener]
+│   │   │   │   └── useFetchData.ts        [Custom hook: historical data fetching]
+│   │   │   │
+│   │   │   ├── types/
+│   │   │   │   └── index.ts               [TypeScript interfaces: Alert, Violation, etc.]
+│   │   │   │
+│   │   │   ├── styles/
+│   │   │   │   ├── colors.css             [Color scheme and theme]
+│   │   │   │   ├── layout.css             [Grid, flex, responsive]
+│   │   │   │   ├── components.css         [Component-specific styles]
+│   │   │   │   └── animations.css         [Flash, slide-in animations]
+│   │   │   │
+│   │   │   └── utils/
+│   │   │       ├── formatters.ts          [Date/time/severity formatting]
+│   │   │       ├── constants.ts           [Color maps, severity labels]
+│   │   │       └── api.ts                 [API client functions]
+│   │   │
+│   │   ├── package.json                   [Frontend dependencies]
+│   │   ├── tsconfig.json                  [TypeScript configuration]
+│   │   ├── .gitignore
+│   │   └── README.md                      [Frontend-specific setup]
+│   │
+│   ├── config.py                          [Global configuration: API, database paths]
+│   ├── main.py                            [FastAPI server entry point]
+│   └── database_init.py                   [Initialize SQLite database]
+│
+├── 🗂️ outputs/                            [Generated reports and logs directory]
+│   ├── violations.db                      [SQLite database (auto-created)]
+│   ├── compliance_reports.json            [Append-only JSON log file]
+│   ├── compliance_reports.csv             [Append-only CSV audit log]
+│   └── exports/                           [User-exported files]
+│       ├── export_2024_01_15_csv.csv      [Timestamped exports]
+│       └── export_2024_01_15_json.json
+│
+├── 🧪 tests/                              [Unit tests - BONUS points if included]
+│   ├── __init__.py
+│   ├── test_detection.py                  [Test detection module]
+│   ├── test_severity.py                   [Test severity classification]
+│   ├── test_escalation.py                 [Test routing logic]
+│   ├── test_reports.py                    [Test report generation]
+│   ├── conftest.py                        [Pytest fixtures]
+│   └── fixtures/
+│       ├── sample_detection.json          [Mock detection data]
+│       └── sample_video.mp4               [Small test video]
+│
+├── 📚 docs/                               [Additional documentation]
+│   ├── SETUP_GUIDE.md                     [Step-by-step installation]
+│   ├── API_REFERENCE.md                   [Detailed API docs]
+│   ├── DETECTION_MODELS.md                [Why YOLOv8? Alternatives considered]
+│   ├── DATABASE_SCHEMA.md                 [SQLite schema documentation]
+│   ├── SEVERITY_LOGIC.md                  [Detailed severity mapping explanation]
+│   ├── TROUBLESHOOTING.md                 [Common issues and solutions]
+│   └── FUTURE_IMPROVEMENTS.md             [What you'd do with more time]
+│
+├── 🐳 docker/                             [Docker configuration - BONUS]
+│   ├── Dockerfile                         [Python backend container]
+│   ├── Dockerfile.dashboard               [React frontend container]
+│   └── docker-compose.yml                 [Orchestrate both containers]
+│
+└── .github/
+    └── workflows/                         [CI/CD - BONUS]
+        └── tests.yml                      [GitHub Actions: run tests on push]
+
+
+==========================================================================
+HOW TO INITIALIZE THIS PROJECT
+==========================================================================
+
+# 1. Clone or create repo
+git init factory-compliance-system
+cd factory-compliance-system
+
+# 2. Create folders
+mkdir -p src/detection src/severity src/escalation src/reports src/dashboard
+mkdir -p data/train data/test
+mkdir -p outputs exports/
+mkdir -p tests docs
+
+# 3. Initialize Python backend
+touch src/__init__.py
+touch src/main.py src/config.py src/database_init.py
+touch requirements.txt
+
+# 4. Initialize each module
+touch src/detection/__init__.py src/detection/detector.py src/detection/models.py
+touch src/severity/__init__.py src/severity/classifier.py
+touch src/escalation/__init__.py src/escalation/router.py
+touch src/reports/__init__.py src/reports/generator.py
+# ... etc
+
+# 5. Initialize React frontend
+cd src/dashboard
+npx create-react-app . --template typescript
+# ... or setup manually
+
+# 6. Add git files
+touch .gitignore .env.example README.md
+echo "node_modules/" >> .gitignore
+echo "__pycache__/" >> .gitignore
+echo ".env" >> .gitignore
+echo "outputs/*" >> .gitignore
+
+# 7. Git setup
+git add .
+git commit -m "Initial project structure"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/factory-compliance-system.git
+git push -u origin main
+
+
+==========================================================================
+FILE SIZE EXPECTATIONS
+==========================================================================
+
+After completing the project:
+
+src/detection/detector.py              ~300 lines
+src/severity/classifier.py             ~200 lines
+src/escalation/router.py               ~150 lines
+src/reports/generator.py               ~200 lines
+src/main.py (FastAPI server)           ~150 lines
+src/dashboard/src/components/*.tsx     ~600 lines total
+src/dashboard/src/hooks/*.ts           ~100 lines
+tests/                                 ~300 lines
+
+Total Python: ~1500-1800 lines
+Total React/TS: ~1000-1200 lines
+Total: ~2500-3000 lines of code
+
+README.md                              ~500 words
+ARCHITECTURE.md                        ~300 words
+POLICY_EXTRACTION.md                   ~400 words
+LIMITATIONS.md                         ~300 words
+
+Total documentation: ~1500 words
+
+
+==========================================================================
+DATA SETUP
+==========================================================================
+
+1. Download from Kaggle:
+   https://www.kaggle.com/datasets/trnhhnggiang/videodataset-for-safe-and-unsafe-behaviours
+
+2. Extract into data/ folder:
+   factory-compliance-system/data/train/[8 behavior folders]
+   factory-compliance-system/data/test/[8 behavior folders]
+
+3. Each folder contains ~50-100 MP4 videos at 1920x1080, 24fps
+
+
+==========================================================================
+TECH STACK SUMMARY
+==========================================================================
+
+BACKEND:
+├── FastAPI (web framework)
+├── Uvicorn (ASGI server)
+├── SQLAlchemy (ORM)
+├── Pydantic (data validation)
+├── ultralytics (YOLOv8)
+├── mediapipe (pose detection)
+├── opencv-python (video processing)
+└── python-socketio (WebSocket)
+
+FRONTEND:
+├── React 18 (UI framework)
+├── TypeScript (type safety)
+├── TailwindCSS (styling)
+├── Socket.io-client (WebSocket client)
+├── Axios (HTTP client)
+└── React Router (navigation)
+
+DATABASE:
+└── SQLite (persistent storage)
+
+DEPLOYMENT (OPTIONAL):
+├── Docker (containerization)
+├── Docker Compose (orchestration)
+└── GitHub Pages (documentation)
+
+TESTING (BONUS):
+├── pytest (Python testing)
+├── Jest (React testing)
+└── GitHub Actions (CI/CD)
+
+
+==========================================================================
+NEXT STEPS
+==========================================================================
+
+1. Read FACTORY_COMPLIANCE_PROJECT_PLAN.md (comprehensive spec)
+2. Create folder structure above
+3. Download Kaggle dataset
+4. Read compliance_policy.pdf and create rules.json
+5. Implement Module 1 (Detection)
+6. Implement Module 2 (Severity)
+7. Implement Module 3 (Escalation)
+8. Implement Module 4 (Reports)
+9. Implement Module 5 (Dashboard)
+10. Write documentation (README, ARCHITECTURE, POLICY_EXTRACTION)
+11. Test everything end-to-end
+12. Push to GitHub
+13. Record demo video
+14. Submit repo link
+
+TIMELINE: 5-7 days for complete system
+
+
+==========================================================================
+QUESTIONS YOU'LL ASK AS YOU BUILD
+==========================================================================
+
+Q: Should I fine-tune YOLOv8?
+A: No. Pre-trained on COCO is fine. Document that you'd fine-tune with more time.
+
+Q: Do I need authentication in dashboard?
+A: No. Single-user dashboard is fine. Optional: add simple login.
+
+Q: Should the detection be perfect?
+A: No. ~70-80% accuracy is acceptable. Document limitations.
+
+Q: Do I need to deploy?
+A: No. Local running system is sufficient.
+
+Q: What if module X is not working?
+A: Document it in README. Show what you tried. Honesty = respect.
+
+Q: Should I use cloud services?
+A: No. Keep it local. Easier to run, easier to evaluate.
+
+Q: How polished should the UI be?
+A: Functional > beautiful. A working ugly dashboard beats a pretty broken one.
+
+Q: Do I need a database?
+A: Yes. SQLite is required for report persistence (Module 4).
+
+Q: Can I use different tech stack?
+A: Yes, but stick to Python backend + React frontend. Matches spec.
+
+Q: What if I run out of time?
+A: Submit what you have. Document trade-offs. Honesty matters.
+
+
+Good luck! You've got this! 💪
