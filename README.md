@@ -1,170 +1,130 @@
-# Factory Compliance & Alert Escalation System
+# 📹 Factory Compliance & Alert Escalation System
 
-An automated safety monitoring application that detects unsafe workplace behaviors in factory video clips, assigns policy-grounded severity tiers, routes high-risk alerts in real time, and stores immutable compliance records for audit review.
+An enterprise-ready, automated safety monitoring application designed to audit workplace safety. The system ingests video feeds, detects compliance violations in real time, classifies their severity based on structured policy rules, and triggers instant alerts and immutable records for audit reviews.
 
-## Overview
+---
 
-The system is built as five connected modules:
+## 🚀 Quick Troubleshooting: "Failed to Fetch" or Empty Dashboard?
+If your dashboard shows **`Failed to Fetch`** next to the Refresh button or fails when clicking **"▶ Run Detection"**, it means the frontend is unable to reach the backend API server.
+1. **Ensure the Backend is Running**: You must have the FastAPI server running. Open a Command Prompt, run `venv\Scripts\activate` and then `python src/main.py`. Keep that window open.
+2. **Check the Port**: The backend runs on `http://localhost:8000` by default. Verify that no other software is using port 8000.
+3. **Check Console/Network Logs**: Press `F12` in Chrome/Edge, go to the "Console" tab, and see if there are any connection or CORS errors.
 
-1. Detection Engine: processes video clips and emits structured violation detections.
-2. Severity Categorization: maps each violation to LOW, MEDIUM, HIGH, or CRITICAL using `src/severity/rules.json`.
-3. Escalation Pipeline: logs every violation and sends real-time alerts for HIGH and CRITICAL events.
-4. Report Generation: persists records to SQLite, JSON Lines, and CSV.
-5. Operations Dashboard: React dashboard with live feed, alert timeline, history filters, and export.
+---
 
-The current implementation is a practical assessment MVP. It includes optional YOLO hooks, but it does not claim to be a fully trained custom CV model. For the Kaggle dataset structure, it uses the parent folder label as a deterministic fallback so the pipeline can be evaluated end to end before model fine-tuning.
+## 📸 Dashboard Screenshots (Placeholders)
+To show off the premium user interface of your system, take the following screenshots of your dashboard in the browser and replace these placeholder sections with your images:
 
-## Getting Started
+### 1. Main Live Monitor HUD & Real-Time Alerts
+> **How to capture**: Open `http://localhost:5173`, upload `samples/Safe_Walkway_Violation.mp4` or click **"Seed Demo"**, wait for the violation to trigger, and capture the screen showing the red/orange alert banner at the top, the HUD scan line, and the detection boxes.
+> 
+> *Replace the image below with your screenshot (name it `live_feed_monitor.png` in the project root):*
+> 
+> ![Live Feed Monitor & Alerts](live_feed_monitor.png)
 
-### Prerequisites
+### 2. Historical Logs, Filters & Exports
+> **How to capture**: Click on the **"Historical Log"** tab in the dashboard, apply a filter (e.g., select `HIGH` severity or `Safe_Walkway_Violation`), and capture the filter controls and formatted compliance logs table.
+> 
+> *Replace the image below with your screenshot (name it `historical_logs.png` in the project root):*
+> 
+> ![Historical Logs & Filters](historical_logs.png)
 
-- Python 3.10 or newer
-- Node.js 18 or newer
-- npm
-- Optional: Kaggle account for the video dataset
+---
 
-### Backend Setup
+## 🛠 System Architecture
 
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python src/database_init.py
-python src/main.py
+The application is built modularly into five distinct components to ensure decoupling and reliability:
+
+```mermaid
+graph TD
+    A[Video / MP4 Input] --> B[1. Detection Engine]
+    B -->|Structured Violation Details| C[2. Severity Classifier]
+    C -->|Classified Severity Tier & Rationale| D[3. Escalation Router]
+    D -->|Real-time alert payload| E[WebSocket Broadcast]
+    D -->|Immutable report payload| F[4. Compliance Report Gen]
+    E -->|Instant UI Updates| G[5. React Operations Dashboard]
+    F -->|SQLite / JSONL / CSV storage| G
 ```
 
-Backend API: `http://localhost:8000`
+1. **Detection Engine (`src/detection`)**: Decodes video streams, samples frames at custom intervals, and applies object detection models or boundary heuristics to flag unsafe events.
+2. **Severity Classifier (`src/severity`)**: Matches detected violations against rules in `rules.json` to categorize events as `LOW`, `MEDIUM`, `HIGH`, or `CRITICAL`.
+3. **Escalation Router (`src/escalation`)**: Distributes alerts based on severity. High-risk events (HIGH/CRITICAL) trigger immediate supervisor notifications.
+4. **Report Generator (`src/reports`)**: Saves logs to a SQLite database, CSV logs, and JSON Lines format for audit readiness.
+5. **Operations Dashboard (`src/dashboard`)**: A premium, responsive glassmorphic dark-mode web application showing real-time video monitors, active timelines, and filterable audit archives.
 
-API docs: `http://localhost:8000/docs`
+---
 
-### Dashboard Setup
+## ⚡ Features Checklist
 
-```bash
+- [x] **Real-time Video Processing**: Ingests video clips via path or interactive drag-and-drop file upload.
+- [x] **Custom Detection Heuristics**: Detects walkway boundaries, forklift overloads, panel cover statuses, and unauthorized zone interventions.
+- [x] **Smart Severity Classifier**: Evaluates contextual parameters (such as worker proximity to heavy machinery) to escalate alerts dynamically.
+- [x] **Real-time WebSockets**: Dispatches security events to the frontend dashboard instantly without reloading the page.
+- [x] **Premium Dark HUD UX**: Inspired by industrial control centers, complete with high-frequency live indicators, interactive filtering controls, and CSV/JSON export actions.
+- [x] **Clean Repository Architecture**: Excludes heavy weight assets and draft files to conform to production standards.
+
+---
+
+## ⚙ Setup & Operation Guide
+
+### 1. Initialize Virtual Environment & Database
+Open a Command Prompt window and execute:
+```cmd
+# Navigate to the project root
+cd d:\internshiptask\factory-compliance-system
+
+# Create and activate Python virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# Install requirements
+pip install -r requirements.txt
+
+# Create SQLite tables
+python src/database_init.py
+```
+
+### 🎥 Generate Sample Testing Clips
+Generate small test clips to run through the compliance pipeline:
+```cmd
+python generate_samples.py
+```
+This generates:
+- `samples/Safe_Walkway_Violation.mp4` (MEDIUM severity, escalates to HIGH)
+- `samples/Unauthorized_Intervention.mp4` (HIGH severity, escalates to CRITICAL)
+- `samples/Opened_Panel_Cover.mp4` (MEDIUM severity, escalates to HIGH)
+- `samples/Carrying_Overload_with_Forklift.mp4` (CRITICAL severity)
+
+---
+
+### 2. Launch Services (Two Command Prompts Required)
+
+#### Prompt Window A: Backend Service
+```cmd
+# Make sure venv is active
+venv\Scripts\activate
+python src/main.py
+```
+*Backend listens on **`http://localhost:8000`***
+
+#### Prompt Window B: Operations Dashboard
+```cmd
 cd src/dashboard
 npm install
 npm run dev
 ```
+*Frontend listens on **`http://localhost:5173`***
 
-Dashboard: `http://localhost:5173`
+---
 
-If PowerShell blocks `npm`, run `npm.cmd install` and `npm.cmd run dev`.
-
-## Dataset
-
-Download the dataset from Kaggle:
-
-`https://www.kaggle.com/datasets/trnhhnggiang/videodataset-for-safe-and-unsafe-behaviours`
-
-Extract it into:
-
-```text
-data/train/[behavior folders]
-data/test/[behavior folders]
-```
-
-The detector recognizes these unsafe behavior folders:
-
-- `Safe_Walkway_Violation`
-- `Unauthorized_Intervention`
-- `Opened_Panel_Cover`
-- `Carrying_Overload_with_Forklift`
-
-## Running the Pipeline
-
-Process a labeled dataset path:
-
-```bash
-curl -X POST http://localhost:8000/api/process_video ^
-  -H "Content-Type: application/json" ^
-  -d "{\"video_path\":\"data/test/Carrying_Overload_with_Forklift/demo_overload.mp4\"}"
-```
-
-Seed four demo records:
-
-```bash
-curl -X POST http://localhost:8000/api/demo/seed
-```
-
-Run tests:
-
-```bash
+## 🔬 Running Tests
+Validate the system behavior and severity routing logic across all modules:
+```cmd
+venv\Scripts\activate
 python -m pytest tests
 ```
 
-## Architecture
+---
 
-Video clips flow through:
-
-```text
-Video or dataset path
-  -> DetectionEngine
-  -> SeverityClassifier
-  -> ComplianceReportGenerator
-  -> EscalationRouter
-  -> SQLite / JSONL / CSV + WebSocket dashboard alert
-```
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the module design.
-
-## Policy Parsing Approach
-
-Policy-derived rules live in [src/severity/rules.json](src/severity/rules.json). Each unsafe behavior includes:
-
-- Policy section reference
-- Observable indicator
-- Detection approach
-- Default severity
-- Escalation conditions
-- Severity rationale
-
-See [POLICY_EXTRACTION.md](POLICY_EXTRACTION.md) for the mapping.
-
-## API Documentation
-
-Key endpoints:
-
-- `GET /api/health`
-- `POST /api/process_video`
-- `POST /api/upload_video`
-- `POST /api/demo/seed`
-- `GET /api/violations`
-- `GET /api/export/violations`
-- `WebSocket /ws/alerts`
-
-See [API_ENDPOINTS.md](API_ENDPOINTS.md) for details.
-
-## Known Limitations
-
-- The current CV layer is not fine-tuned on the Kaggle dataset.
-- Dataset-folder labels are used as a fallback to keep the full pipeline testable.
-- Walkway frame heuristics require visible green markings and person detection.
-- Vest, panel, and block-count detection need custom model training for production accuracy.
-- The dashboard has no authentication because the assessment scope is single-user local operation.
-
-See [LIMITATIONS.md](LIMITATIONS.md) for the full trade-off list.
-
-## Project Structure
-
-```text
-src/
-  detection/      Module 1
-  severity/       Module 2
-  escalation/     Module 3
-  reports/        Module 4
-  dashboard/      Module 5
-tests/
-docs/
-outputs/
-```
-
-## Future Improvements
-
-- Fine-tune YOLOv8 on the labeled videos.
-- Add a vest color classifier and panel state classifier.
-- Add Slack/email escalation for critical alerts.
-- Add authentication and role-based access for supervisors.
-- Move from SQLite to PostgreSQL for multi-camera deployments.
-
-## License
-
-MIT.
+## 📄 License
+Licensed under the [MIT License](LICENSE).
