@@ -11,6 +11,12 @@ import { seedDemo } from './utils/api';
 
 type Tab = 'live' | 'alerts' | 'history';
 
+const TAB_CONFIG: { id: Tab; label: string; icon: string }[] = [
+  { id: 'live',    label: 'Live Feed',   icon: '📹' },
+  { id: 'alerts',  label: 'Alert Timeline', icon: '🔔' },
+  { id: 'history', label: 'Historical Log', icon: '📋' },
+];
+
 export default function App() {
   const { violations, setViolations, stats, loading, error, refresh } = useFetchData();
   const [activeTab, setActiveTab] = useState<Tab>('live');
@@ -47,6 +53,9 @@ export default function App() {
     refresh(filters);
   }
 
+  const criticalCount = violations.filter((v) => v.severity === 'CRITICAL').length;
+  const highCount     = violations.filter((v) => v.severity === 'HIGH').length;
+
   return (
     <main className="app-shell">
       <Navbar
@@ -56,42 +65,49 @@ export default function App() {
         onSeedDemo={handleSeedDemo}
         onRefresh={() => refresh()}
       />
+
       <AlertNotification
         alert={latestAlert}
         onDismiss={() => setLatestAlert(null)}
       />
 
+      {/* Tabs */}
       <nav className="tabs" aria-label="Dashboard views">
-        <button
-          className={activeTab === 'live' ? 'active' : ''}
-          onClick={() => setActiveTab('live')}
-          type="button"
-        >
-          Live
-        </button>
-        <button
-          className={activeTab === 'alerts' ? 'active' : ''}
-          onClick={() => setActiveTab('alerts')}
-          type="button"
-        >
-          Alerts
-        </button>
-        <button
-          className={activeTab === 'history' ? 'active' : ''}
-          onClick={() => setActiveTab('history')}
-          type="button"
-        >
-          History
-        </button>
+        {TAB_CONFIG.map(({ id, label, icon }) => {
+          const count =
+            id === 'alerts'
+              ? criticalCount + highCount
+              : id === 'history'
+              ? violations.length
+              : null;
+
+          return (
+            <button
+              key={id}
+              className={activeTab === id ? 'active' : ''}
+              onClick={() => setActiveTab(id)}
+              type="button"
+              aria-current={activeTab === id ? 'page' : undefined}
+            >
+              <span aria-hidden="true">{icon}</span>
+              {label}
+              {count != null && count > 0 && (
+                <span className="tab-count">{count}</span>
+              )}
+            </button>
+          );
+        })}
       </nav>
 
-      {activeTab === 'live' && (
-        <LiveFeedMonitor violations={violations} onProcessed={addReports} />
-      )}
-      {activeTab === 'alerts' && <AlertTimeline violations={violations} />}
-      {activeTab === 'history' && (
-        <HistoricalLog violations={violations} onFilter={handleFilter} />
-      )}
+      <div className="content-area">
+        {activeTab === 'live' && (
+          <LiveFeedMonitor violations={violations} onProcessed={addReports} />
+        )}
+        {activeTab === 'alerts' && <AlertTimeline violations={violations} />}
+        {activeTab === 'history' && (
+          <HistoricalLog violations={violations} onFilter={handleFilter} />
+        )}
+      </div>
     </main>
   );
 }

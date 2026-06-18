@@ -8,19 +8,39 @@ interface AlertNotificationProps {
 
 export default function AlertNotification({
   alert,
-  onDismiss
+  onDismiss,
 }: AlertNotificationProps) {
   if (!alert || !['HIGH', 'CRITICAL'].includes(alert.severity)) return null;
 
+  const isCritical = alert.severity === 'CRITICAL';
+
   return (
-    <div className={`alert-notification ${alert.severity.toLowerCase()}`}>
-      <div>
-        <strong>{alert.severity} safety alert</strong>
-        <span>{formatBehavior(alert.behavior_class)}</span>
-        <small>{formatDateTime(alert.timestamp)}</small>
+    <div
+      className={`alert-notification ${alert.severity.toLowerCase()}`}
+      role="alert"
+      aria-live="assertive"
+    >
+      <div className="alert-notification-body">
+        <span className="alert-icon" aria-hidden="true">
+          {isCritical ? '🚨' : '⚠️'}
+        </span>
+        <div className="alert-notification-text">
+          <strong>
+            {isCritical ? '🔴 CRITICAL SAFETY ALERT' : '🟠 HIGH SEVERITY ALERT'}
+          </strong>
+          <span>{formatBehavior(alert.behavior_class)}</span>
+          <small>
+            {alert.zone} · {formatDateTime(alert.timestamp)} · {alert.policy_rule_ref}
+          </small>
+        </div>
       </div>
-      <button className="icon-button" onClick={onDismiss} type="button" aria-label="Dismiss">
-        x
+      <button
+        className="icon-button"
+        onClick={onDismiss}
+        type="button"
+        aria-label="Dismiss alert"
+      >
+        ✕
       </button>
     </div>
   );

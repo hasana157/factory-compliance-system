@@ -13,60 +13,71 @@ export default function FilterBar({
   filters,
   onChange,
   onApply,
-  onReset
+  onReset,
 }: FilterBarProps) {
+  const activeCount = [
+    filters.severity,
+    filters.behavior_class,
+    filters.start_date,
+    filters.end_date,
+  ].filter(Boolean).length;
+
   return (
     <div className="filter-bar">
       <label className="field compact">
         <span>Severity</span>
         <select
           value={filters.severity || ''}
-          onChange={(event) => onChange({ ...filters, severity: event.target.value })}
+          onChange={(e) => onChange({ ...filters, severity: e.target.value })}
         >
-          <option value="">All</option>
-          {SEVERITY_ORDER.map((severity) => (
-            <option key={severity} value={severity}>
-              {severity}
+          <option value="">All severities</option>
+          {SEVERITY_ORDER.map((s) => (
+            <option key={s} value={s}>
+              {s}
             </option>
           ))}
         </select>
       </label>
+
       <label className="field compact">
         <span>Behavior</span>
         <select
           value={filters.behavior_class || ''}
-          onChange={(event) =>
-            onChange({ ...filters, behavior_class: event.target.value })
+          onChange={(e) =>
+            onChange({ ...filters, behavior_class: e.target.value })
           }
         >
-          <option value="">All</option>
-          {BEHAVIOR_CLASSES.map((behavior) => (
-            <option key={behavior} value={behavior}>
-              {formatBehavior(behavior)}
+          <option value="">All behaviors</option>
+          {BEHAVIOR_CLASSES.map((b) => (
+            <option key={b} value={b}>
+              {formatBehavior(b)}
             </option>
           ))}
         </select>
       </label>
+
       <label className="field compact">
-        <span>Start</span>
+        <span>From date</span>
         <input
           type="date"
           value={filters.start_date || ''}
-          onChange={(event) => onChange({ ...filters, start_date: event.target.value })}
+          onChange={(e) => onChange({ ...filters, start_date: e.target.value })}
         />
       </label>
+
       <label className="field compact">
-        <span>End</span>
+        <span>To date</span>
         <input
           type="date"
           value={filters.end_date || ''}
-          onChange={(event) => onChange({ ...filters, end_date: event.target.value })}
+          onChange={(e) => onChange({ ...filters, end_date: e.target.value })}
         />
       </label>
+
       <button className="button primary" type="button" onClick={onApply}>
-        Apply
+        {activeCount > 0 ? `Apply (${activeCount})` : 'Apply'}
       </button>
-      <button className="button secondary" type="button" onClick={onReset}>
+      <button className="button secondary" type="button" onClick={onReset} disabled={activeCount === 0}>
         Reset
       </button>
     </div>
