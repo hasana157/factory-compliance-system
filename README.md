@@ -1,58 +1,70 @@
 # FactoryGuard: Real-Time Factory Safety Monitoring
 
-**Detect unsafe workplace behaviors in real-time. 100x cheaper than enterprise solutions.**
+**Detect unsafe workplace behaviors in real-time. 100× cheaper than enterprise solutions.**
 
 FactoryGuard automatically detects factory safety violations (walkway breaches, equipment overloads, unauthorized access) and broadcasts real-time alerts. It's designed for mid-size factories that need professional-grade monitoring without the $50K+/month price tag.
 
 **Key Stats:**
-- 94-98% detection accuracy
-- 18ms alert latency  
-- 11.67x faster than real-time processing
+- 94–98% detection accuracy
+- 18ms alert latency
+- 11.67× faster than real-time processing
 - Works on single CPU (no expensive hardware)
 
 **Built with:** Python + FastAPI | React | OpenCV/YOLO | WebSockets | SQLite
 
 ---
 
+## Table of Contents
+
+- [Live System Gallery](#-live-system-gallery)
+- [Why This Matters](#-why-this-matters)
+- [Detection Accuracy](#detection-accuracy)
+- [Real Performance Numbers](#-real-performance-numbers)
+- [Architecture](#architecture)
+- [Severity Classification](#severity-classification)
+- [Core Modules](#core-modules)
+- [Quick Start](#quick-start)
+- [API Endpoints](#api-endpoints)
+- [Database Schema](#database-schema)
+- [Testing](#testing)
+- [Known Limitations](#known-limitations)
+- [Roadmap](#roadmap)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Related Documentation](#related-documentation)
+- [Contributing & Support](#contributing--support)
+- [License](#license)
+
+---
+
 ## 📸 Live System Gallery
 
 ### Main Dashboard
-<img width="2511" height="1179" alt="image" src="https://github.com/user-attachments/assets/d39f190e-c49d-4fea-893f-a2a5a1a49566" />
-
+<img alt="Main Dashboard — Live feed with detection overlays and severity indicators" src="https://github.com/user-attachments/assets/d39f190e-c49d-4fea-893f-a2a5a1a49566" style="max-width:800px; width:100%; height:auto;" />
 
 ### Key Features
 | Live Monitoring | Audit Logs | Filters |
 |---|---|---|
-| <img width="1846" height="933" alt="image" src="https://github.com/user-attachments/assets/a37c6a0c-f9c2-418d-ae89-03a031d344f8" />
- |<img width="2427" height="980" alt="image" src="https://github.com/user-attachments/assets/de5d28de-8ea9-47f1-9a5a-da83dcaa5da3" />
- |<img width="2422" height="1002" alt="image" src="https://github.com/user-attachments/assets/e21d21f7-a674-4a78-acc5-8253f07f44ff" />
- |
+| <img alt="Live feed with bounding boxes and confidence scores" src="https://github.com/user-attachments/assets/a37c6a0c-f9c2-418d-ae89-03a031d344f8" style="max-width:400px; width:100%; height:auto;" /> | <img alt="Historical audit log with severity badges" src="https://github.com/user-attachments/assets/de5d28de-8ea9-47f1-9a5a-da83dcaa5da3" style="max-width:400px; width:100%; height:auto;" /> | <img alt="Filterable violation log with date range and export" src="https://github.com/user-attachments/assets/e21d21f7-a674-4a78-acc5-8253f07f44ff" style="max-width:400px; width:100%; height:auto;" /> |
 
-### Alerts & API (Optional - for 9 images total)
+### Alerts & API
 | Alert Notification | Metrics | Swagger API |
 |---|---|---|
-| <img width="2491" height="203" alt="image" src="https://github.com/user-attachments/assets/00e1569f-d19c-4b7b-a444-ad62d1b9af92" />
- | <img width="542" height="643" alt="image" src="https://github.com/user-attachments/assets/b316eb79-f250-4e10-99f4-014afa6510ed" />
- | <img width="1490" height="1048" alt="image" src="https://github.com/user-attachments/assets/bf7d8d30-3e2b-4ffd-adba-f596e44c14bb" />
- |
+| <img alt="Critical safety alert banner with flash animation" src="https://github.com/user-attachments/assets/00e1569f-d19c-4b7b-a444-ad62d1b9af92" style="max-width:400px; width:100%; height:auto;" /> | <img alt="System metrics showing detection counts and severity breakdown" src="https://github.com/user-attachments/assets/b316eb79-f250-4e10-99f4-014afa6510ed" style="max-width:400px; width:100%; height:auto;" /> | <img alt="Swagger API documentation interface" src="https://github.com/user-attachments/assets/bf7d8d30-3e2b-4ffd-adba-f596e44c14bb" style="max-width:400px; width:100%; height:auto;" /> |
 
 ---
 
 ## 🚨 Why This Matters
 
-**The Reality:**
-- 1000+ factory workers die annually from preventable violations
-- Manual audits cost 40+ hours/month and miss 30% of incidents
-- Enterprise solutions cost $50K+/month (out of reach for mid-size factories)
-- Most violations caught *after* someone is injured, not before
+With 2.3M annual workplace accidents globally, early detection saves lives — but most factories can't afford $50K/month enterprise solutions. Manual audits cost 40+ hours/month, miss ~30% of incidents, and catch violations *after* someone is injured.
 
-**FactoryGuard solves:** Real-time detection at 1/100th the cost
+**FactoryGuard solves this:** real-time, automated detection at 1/100th the cost, running on commodity hardware.
 
 ---
 
 ## Detection Accuracy
 
-Validated using an automated test harness (`scripts/validate_kaggle.py`) against synthetic/Kaggle video datasets.
+Validated using an automated test harness ([`scripts/validate_kaggle.py`](scripts/validate_kaggle.py)) against synthetic and Kaggle video datasets.
 
 | Violation Type | Precision | Recall | F1-Score | Method | Notes |
 |---|---|---|---|---|---|
@@ -62,6 +74,9 @@ Validated using an automated test harness (`scripts/validate_kaggle.py`) against
 | Unauthorized_Intervention | 100.0% | 100.0% | 1.000 | Heuristic (green vest ratio) | Vest color checking |
 | **Overall** | **100.0%** | **100.0%** | **1.000** | Hybrid CV Heuristics | Zero false positives on test set |
 
+> [!NOTE]
+> **Real-World Caveat:** The metrics above are measured on a controlled synthetic dataset that mimics the policy-defined behaviors. Real-factory performance may vary due to lighting, camera angles, occlusions, and environmental conditions (fog, glare, night shifts). We are actively collecting real-world footage to recalibrate our heuristics and plan to publish updated benchmarks on production data.
+
 ---
 
 ## 📊 Real Performance Numbers
@@ -70,9 +85,9 @@ Benchmarked on a single CPU instance.
 
 | Metric | Result | What It Means |
 |---|---|---|
-| **Detection Accuracy** | 94-98% | Catches real violations, not false alarms |
+| **Detection Accuracy** | 94–98% | Catches real violations, not false alarms |
 | **Alert Latency** | 18ms | Video → dashboard notification |
-| **Processing Speed** | 11.67x faster | 2-minute video in 10 seconds |
+| **Processing Speed** | 11.67× faster | 2-minute video in 10 seconds |
 | **Memory Usage** | 340MB baseline | Runs on simple CPU (no GPU needed) |
 | **DB Performance** | 4.2ms | Instant historical logs query |
 
@@ -106,8 +121,22 @@ Video Clip
 FactoryGuard uses an automated pipeline to extract compliance rules directly from official EHS policy PDFs.
 1. `pdfplumber` extracts raw text from the policy.
 2. `google-generativeai` (Gemini) parses the text into a structured JSON schema defining behaviors, severity, and escalation rules.
-3. Output is validated against the schema and checked against the original text using TF-IDF cosine similarity to prevent hallucination (enforcing a strict >= 0.70 similarity threshold).
+3. Output is validated against the schema and checked against the original text using TF-IDF cosine similarity to prevent hallucination (enforcing a strict >= 0.70 similarity threshold on **both** the observable indicator and the semantic description).
 4. The generated `auto_generated_rules.json` serves as the single source of truth for the rest of the pipeline.
+
+### LLM Resilience & Fallback Strategy
+
+The system is designed to operate even when the Gemini API is unavailable:
+
+| Scenario | Behavior |
+|---|---|
+| **Gemini API available** | Full LLM extraction → structured validation → `auto_generated_rules.json` generated fresh. |
+| **Gemini API unavailable** | Falls back to the **last successfully generated** `auto_generated_rules.json` (cached on disk). A warning is logged for manual review. |
+| **LLM output fails validation** | If cosine similarity < 0.70 or schema validation fails, the extraction is rejected entirely. The system continues using the cached rules and logs the failure for operator attention. |
+| **Low-confidence detections** | Detections with confidence scores below the configured threshold are flagged as `NEEDS_REVIEW` rather than generating automatic alerts, preventing false escalations. |
+
+> [!IMPORTANT]
+> The cached `auto_generated_rules.json` ensures **zero downtime** — the detection pipeline never stalls waiting for an LLM response. The LLM is only invoked during policy re-parsing, not during real-time video processing.
 
 ### Why Hybrid Detection (Not Pure ML)
 
@@ -147,15 +176,15 @@ def detect_walkway_breach(frame, person_bbox):
 
 ## Severity Classification
 
-Each violation is classified against policy rules defined in `src/severity/rules.json`.
+Each violation is classified against policy rules defined in [`auto_generated_rules.json`](src/severity/auto_generated_rules.json), which is auto-generated from the compliance policy PDF.
 
-**Default tiers:**
+**Default Tiers:**
 - **LOW** — Minor deviations, momentary lapses
 - **MEDIUM** — Walkway breach, opened panel cover
 - **HIGH** — Breach near machinery, unauthorized equipment access
 - **CRITICAL** — Forklift overload, multiple unauthorized workers near active equipment
 
-**Dynamic escalation:**
+**Dynamic Escalation:**
 - Walkway Violation (MEDIUM) escalates to HIGH if worker is within 1.0m of machinery.
 - Unauthorized Intervention (HIGH) escalates to CRITICAL if multiple workers are present.
 - Open Panel Cover (MEDIUM) escalates to HIGH after 5 minutes or if personnel are within 1.0m.
@@ -166,11 +195,13 @@ Each violation is classified against policy rules defined in `src/severity/rules
 
 | Module | Location | Responsibility |
 |---|---|---|
+| Policy Parser | `parser/` | Extracts compliance rules from PDF via LLM with cosine similarity validation |
 | Detection Engine | `src/detection/` | Processes video frames, extracts violations with bounding boxes and confidence scores |
-| Severity Classifier | `src/severity/` | Maps violations to severity tiers using declarative JSON policy rules |
+| Severity Classifier | `src/severity/` | Maps violations to severity tiers using auto-generated JSON policy rules |
 | Escalation Router | `src/escalation/` | Routes HIGH/CRITICAL alerts via WebSocket; logs all events to database |
 | Report Generator | `src/reports/` | Writes immutable records to SQLite, JSONL, and CSV |
 | Dashboard | `src/dashboard/` | React UI — live feed, alert timeline, historical logs with filtering and export |
+| Validation Scripts | `scripts/` | Kaggle dataset validation harness, batch inference, and result analysis |
 
 ---
 
@@ -293,10 +324,10 @@ Records are append-only — never modified or deleted.
 
 ```bash
 # Unit tests
-pytest tests/unit -v
+pytest tests/ -v
 
-# Integration tests
-pytest tests/integration -v
+# Kaggle dataset validation (full harness)
+python scripts/validate_kaggle.py
 ```
 
 **Covered:**
@@ -305,8 +336,9 @@ pytest tests/integration -v
 - WebSocket message formatting
 - Database transaction integrity
 - API endpoint validation
+- LLM output cosine similarity validation (>= 0.70 threshold)
 
-**Not covered yet:**
+**Not Covered Yet:**
 - 20+ concurrent streams
 - Nighttime / low-light conditions
 - Rain or fog on camera lens
@@ -336,7 +368,8 @@ None block MVP deployment. All have clear solutions.
 - [x] WebSocket real-time alerts
 - [x] Compliance audit logs (SQLite + JSONL + CSV)
 - [x] React dashboard with live feed, filters, export
-- [ ] Reduce false positive rate
+- [x] LLM-grounded policy parsing with hallucination prevention
+- [ ] Reduce false positive rate on production footage
 - [ ] Load test 8+ concurrent feeds
 
 ### Phase 2: Scale
@@ -361,6 +394,7 @@ None block MVP deployment. All have clear solutions.
 | Vision | OpenCV + YOLOv8 | Battle-tested, real-time capable |
 | Real-Time | WebSockets | <20ms alert delivery |
 | Database | SQLite (WAL mode) | Zero DevOps, ACID-compliant |
+| Policy Parsing | Gemini LLM + pdfplumber | Automated rule extraction with validation |
 | Deployment | Docker Compose | Reproducible single-command setup |
 
 ---
@@ -369,9 +403,20 @@ None block MVP deployment. All have clear solutions.
 
 ```
 factory-compliance-system/
+├── parser/               # LLM-based policy parsing (PDF → auto_generated_rules.json)
+│   ├── policy_parser.py  # Main parser orchestrator
+│   ├── prompts.py        # Structured LLM prompts
+│   └── validators.py     # TF-IDF cosine similarity validation (>= 0.70 threshold)
+├── pipeline/             # Pipeline orchestration modules
+│   └── parsers/          # PDF extraction and LLM rule extraction
+├── scripts/              # Automation and validation scripts
+│   ├── validate_kaggle.py    # Full Kaggle dataset validation harness
+│   ├── batch_inference.py    # Batch video processing
+│   ├── analyze_results.py    # Result analysis and reporting
+│   └── download_kaggle.py    # Dataset download utility
 ├── src/
 │   ├── detection/        # Video processing and violation detection
-│   ├── severity/         # Policy-based severity classification (rules.json)
+│   ├── severity/         # Policy-based severity classification (auto_generated_rules.json)
 │   ├── escalation/       # WebSocket alert routing
 │   ├── reports/          # Immutable report generation (SQLite, JSONL, CSV)
 │   ├── dashboard/        # React frontend
@@ -382,6 +427,7 @@ factory-compliance-system/
 ├── data/                 # Test video data
 ├── outputs/              # Generated reports and database
 ├── docker/               # Dockerfiles
+├── Compliance_Policy_Manual.pdf  # Source EHS policy document
 ├── docker-compose.yml
 ├── requirements.txt
 ├── ARCHITECTURE.md
@@ -403,6 +449,18 @@ factory-compliance-system/
 
 ---
 
+## Contributing & Support
+
+Contributions are welcome! If you'd like to improve FactoryGuard:
+
+1. **Report bugs** — Open a [GitHub Issue](https://github.com/hasana157/factory-compliance-system/issues) with steps to reproduce.
+2. **Suggest features** — Describe the use case and expected behavior in an issue.
+3. **Submit a PR** — Fork the repo, create a feature branch, and open a pull request with a clear description.
+
+For questions or support, reach out via GitHub Issues or connect on [LinkedIn](https://github.com/hasana157).
+
+---
+
 ## License
 
-MIT License — See LICENSE file
+MIT License — See [LICENSE](LICENSE) for full text.
