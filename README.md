@@ -11,34 +11,8 @@ FactoryGuard automatically detects factory safety violations (walkway breaches, 
 - Works on single CPU (no expensive hardware)
 
 **Built with:** Python + FastAPI | React | OpenCV/YOLO | WebSockets | SQLite
-
 ---
-
-## Table of Contents
-
-- [Live System Gallery](#-live-system-gallery)
-- [Why This Matters](#-why-this-matters)
-- [Detection Accuracy](#detection-accuracy)
-- [Real Performance Numbers](#-real-performance-numbers)
-- [Architecture](#architecture)
-- [Severity Classification](#severity-classification)
-- [Core Modules](#core-modules)
-- [Quick Start](#quick-start)
-- [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [Testing](#testing)
-- [Known Limitations](#known-limitations)
-- [Roadmap](#roadmap)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Related Documentation](#related-documentation)
-- [Contributing & Support](#contributing--support)
-- [License](#license)
-
 ---
-
-## 📸 Live System Gallery
-
 ### Main Dashboard
 <img alt="Main Dashboard — Live feed with detection overlays and severity indicators" src="https://github.com/user-attachments/assets/d39f190e-c49d-4fea-893f-a2a5a1a49566" style="max-width:800px; width:100%; height:auto;" />
 
