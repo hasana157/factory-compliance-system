@@ -12,28 +12,6 @@ FactoryGuard automatically detects factory safety violations (walkway breaches, 
 
 **Built with:** Python + FastAPI | React | OpenCV/YOLO | WebSockets | SQLite
 ---
-
-## Table of Contents
-
-- [Live System Gallery](#-live-system-gallery)
-- [Why This Matters](#-why-this-matters)
-- [Detection Accuracy](#detection-accuracy)
-- [Real Performance Numbers](#-real-performance-numbers)
-- [System Architecture](#%EF%B8%8F-system-architecture)
-- [Severity Classification](#severity-classification)
-- [Core Modules](#core-modules)
-- [Quick Start](#quick-start)
-- [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [Testing](#testing)
-- [Known Limitations](#known-limitations)
-- [Roadmap](#roadmap)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Related Documentation](#related-documentation)
-- [Contributing & Support](#contributing--support)
-- [License](#license)
-
 ---
 ### Main Dashboard
 <img alt="Main Dashboard — Live feed with detection overlays and severity indicators" src="https://github.com/user-attachments/assets/d39f190e-c49d-4fea-893f-a2a5a1a49566" style="max-width:800px; width:100%; height:auto;" />
@@ -478,7 +456,6 @@ factory-compliance-system/
 ```
 
 ---
-
 ## Related Documentation
 
 - [Architecture](ARCHITECTURE.md) — Pipeline design and module details
@@ -490,14 +467,10 @@ factory-compliance-system/
 ---
 
 ## Contributing & Support
-
 Contributions are welcome! If you'd like to improve FactoryGuard:
-
 1. **Report bugs** — Open a [GitHub Issue](https://github.com/hasana157/factory-compliance-system/issues) with steps to reproduce.
 2. **Suggest features** — Describe the use case and expected behavior in an issue.
 3. **Submit a PR** — Fork the repo, create a feature branch, and open a pull request with a clear description.
-
-For questions or support, reach out via GitHub Issues or connect on [LinkedIn](https://github.com/hasana157).
 
 ---
 
