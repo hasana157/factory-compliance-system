@@ -156,39 +156,22 @@ The system is designed to operate even when the Gemini API is unavailable:
 > [!IMPORTANT]
 > The cached `auto_generated_rules.json` ensures **zero downtime** — the detection pipeline never stalls waiting for an LLM response. The LLM is only invoked during policy re-parsing, not during real-time video processing.
 
-### Why Hybrid Detection (Not Pure ML)
+### Design Decisions & Trade-offs
 
-- Pure YOLO: high accuracy but ~200ms per frame — too slow for safety.
-- Pure heuristics: fast (8ms) but brittle under inconsistent lighting.
-- **Hybrid approach:** heuristics run first (walkway green pixel ratio, forklift block count) at ~8ms. YOLO validates borderline cases, adding ~10ms. Total: ~18ms with better accuracy than either alone.
+**Detection Approach: Why Heuristics (Today)?**
+- Rapid MVP to demonstrate integration (not ML in isolation)
+- Proves policy → code translation works
+- YOLOv8 hooks ready for production replacement
+- Production next step: fine-tune on labeled Kaggle data (estimated 2-3 weeks)
 
-```python
-# Walkway breach: heuristic-first detection
-def detect_walkway_breach(frame, person_bbox):
-    green_ratio = count_green_pixels(frame[person_bbox]) / frame.size
-    if green_ratio < 0.05:
-        return WALKWAY_BREACH  # ~8ms
+**Why WebSockets for Alerts?**
+- 0-latency push notifications required by spec
+- Suitable for 10–100 concurrent dashboard users
+- Production scaling: Kafka + pub/sub broker system
 
-    # Borderline? Validate with YOLO
-    if 0.05 < green_ratio < 0.10:
-        if yolo_detector(frame).confidence < 0.6:
-            return WALKWAY_BREACH  # ~18ms total
-```
-
-### Why WebSockets (Not REST Polling)
-
-- REST polling at 400ms intervals on factory WiFi = 382ms alert delay.
-- A worker at 5 mph travels ~2.8 feet in that time — enough to cause a collision.
-- WebSocket push delivers alerts in <20ms.
-- Trade-off: higher server memory per connection, but acceptable for safety-critical alerts.
-
-### Why SQLite (Not PostgreSQL)
-
-- MVP scope: 1–2 factories, no dedicated DBA.
-- Compliance records are immutable (write-heavy, rarely updated).
-- WAL mode provides sufficient concurrency.
-- Backup = copy a single file.
-- **Scaling plan:** migrate to PostgreSQL at 10+ factories (2–3 day effort).
+**Why SQLite?**
+- MVP: no multi-instance deployment
+- Production: PostgreSQL with time-series partitioning
 
 ---
 
@@ -363,7 +346,20 @@ python scripts/validate_kaggle.py
 
 ---
 
-## Known Limitations
+## Known Accuracy Limitations
+
+### Detection Accuracy by Behavior Class
+
+| Behavior | Current Accuracy | Approach | Production Target |
+|----------|------------------|----------|-------------------|
+| Safe Walkway | 60% (heuristic) | Green pixel ratio | 85%+ (YOLO segmentation) |
+| Unauthorized Intervention | 0% (stub) | Manual labels | 90%+ (pose + vest classifier) |
+| Opened Panel | 0% (stub) | Not implemented | 88%+ (YOLO detector) |
+| Forklift Overload | 70% (label-based) | Block counting | 92%+ (YOLO block detector) |
+
+**Why so low?** This is an *integration MVP*, not a trained production model.
+
+### System & Operational Limitations
 
 | Limitation | Impact | Planned Fix |
 |---|---|---|
