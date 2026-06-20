@@ -17,17 +17,24 @@ FactoryGuard automatically detects factory safety violations (walkway breaches, 
 ## 📸 Live System Gallery
 
 ### Main Dashboard
-![Main Dashboard](/dashboard_hero.png)
+<img width="2511" height="1179" alt="image" src="https://github.com/user-attachments/assets/d39f190e-c49d-4fea-893f-a2a5a1a49566" />
+
 
 ### Key Features
 | Live Monitoring | Audit Logs | Filters |
 |---|---|---|
-| ![Live](/live_feed_detail.png) | ![Logs](/historical_logs.png) | ![Filters](/filter_toolbar.png) |
+| <img width="1846" height="933" alt="image" src="https://github.com/user-attachments/assets/a37c6a0c-f9c2-418d-ae89-03a031d344f8" />
+ |<img width="2427" height="980" alt="image" src="https://github.com/user-attachments/assets/de5d28de-8ea9-47f1-9a5a-da83dcaa5da3" />
+ |<img width="2422" height="1002" alt="image" src="https://github.com/user-attachments/assets/e21d21f7-a674-4a78-acc5-8253f07f44ff" />
+ |
 
 ### Alerts & API (Optional - for 9 images total)
 | Alert Notification | Metrics | Swagger API |
 |---|---|---|
-| ![Alert](/alert_notification.png) | ![Metrics](/severity_metrics.png) | ![API](/api_docs.png) |
+| <img width="2491" height="203" alt="image" src="https://github.com/user-attachments/assets/00e1569f-d19c-4b7b-a444-ad62d1b9af92" />
+ | <img width="542" height="643" alt="image" src="https://github.com/user-attachments/assets/b316eb79-f250-4e10-99f4-014afa6510ed" />
+ | <img width="1490" height="1048" alt="image" src="https://github.com/user-attachments/assets/bf7d8d30-3e2b-4ffd-adba-f596e44c14bb" />
+ |
 
 ---
 
