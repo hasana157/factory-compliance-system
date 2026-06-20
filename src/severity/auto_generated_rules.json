@@ -1,0 +1,120 @@
+{
+  "Safe_Walkway_Violation": {
+    "description": "Person detected outside green-marked designated safe walkway boundaries.",
+    "observable_indicator": "Person position beyond green walkway boundary.",
+    "detection_approach": "YOLO person detection plus green floor boundary overlap.",
+    "default_severity": "MEDIUM",
+    "default_zone": "Production_Floor",
+    "default_bounding_box": [
+      120,
+      180,
+      360,
+      720
+    ],
+    "label_confidence": 0.85,
+    "policy_section": "Section 4.2.1",
+    "policy_signal": "WARNING",
+    "tier_justification": "Walkway breaches represent high-frequency pedestrian hazards in machinery/traffic zones.",
+    "default_context": {
+      "person_proximity_to_machinery": 1.5,
+      "forklift_operating": false,
+      "personnel_count": 1
+    },
+    "escalation_rules": [
+      {
+        "condition": "person_proximity_to_machinery < 1.0",
+        "new_severity": "HIGH",
+        "rationale": "Pedestrian is within one meter of active machinery."
+      },
+      {
+        "condition": "forklift_operating == true",
+        "new_severity": "HIGH",
+        "rationale": "Walkway breach occurs during active forklift operations."
+      }
+    ]
+  },
+  "Unauthorized_Intervention": {
+    "description": "Personnel performing maintenance or intervention on machinery without authorization vest.",
+    "observable_indicator": "Torso area lacking green safety vest; hands in proximity to operating equipment.",
+    "detection_approach": "YOLO person detection, vest color classification, and machine proximity tracking.",
+    "default_severity": "HIGH",
+    "default_zone": "Equipment_Area",
+    "default_bounding_box": [
+      420,
+      150,
+      760,
+      690
+    ],
+    "label_confidence": 0.85,
+    "policy_section": "Section 7.2.1",
+    "policy_signal": "CRITICAL SAFETY NOTICE",
+    "tier_justification": "Direct physical contact or proximity to moving machinery elements without clearance.",
+    "default_context": {
+      "personnel_count": 1,
+      "equipment_active": true
+    },
+    "escalation_rules": [
+      {
+        "condition": "personnel_count > 1",
+        "new_severity": "CRITICAL",
+        "rationale": "Multiple unauthorized workers compound the machinery safety hazard."
+      }
+    ]
+  },
+  "Opened_Panel_Cover": {
+    "description": "Electrical panel cover left open exposing dangerous internal circuitry.",
+    "observable_indicator": "Electrical or machine cabinet panel door in open position.",
+    "detection_approach": "Template matching or edge density contrast analysis of panel door area.",
+    "default_severity": "MEDIUM",
+    "default_zone": "Electrical_Panel",
+    "default_bounding_box": [
+      780,
+      120,
+      1040,
+      620
+    ],
+    "label_confidence": 0.85,
+    "policy_section": "Section 5.2.2",
+    "policy_signal": "WARNING",
+    "tier_justification": "Exposed high-voltage circuits pose shock and arc flash hazards.",
+    "default_context": {
+      "duration_open": 60,
+      "person_proximity_to_panel": 2.0
+    },
+    "escalation_rules": [
+      {
+        "condition": "duration_open > 300",
+        "new_severity": "HIGH",
+        "rationale": "High-voltage cabinet left open for over five minutes."
+      },
+      {
+        "condition": "person_proximity_to_panel < 1.0",
+        "new_severity": "HIGH",
+        "rationale": "Unprotected person within touching distance of open electrical panel."
+      }
+    ]
+  },
+  "Carrying_Overload_with_Forklift": {
+    "description": "Forklift vehicle carrying more than two stacked blocks or pallets.",
+    "observable_indicator": "Block count on forklift forks is greater than or equal to three.",
+    "detection_approach": "YOLO truck/forklift detection and box contour counting on the forks.",
+    "default_severity": "CRITICAL",
+    "default_zone": "Loading_Area",
+    "default_bounding_box": [
+      300,
+      260,
+      980,
+      760
+    ],
+    "label_confidence": 0.85,
+    "policy_section": "Section 6.3.2",
+    "policy_signal": "CRITICAL SAFETY NOTICE",
+    "tier_justification": "Forklift overloading exceeds capacity, causing instability and tip risks.",
+    "default_context": {
+      "block_count": 3,
+      "forklift_operating": true,
+      "personnel_count": 1
+    },
+    "escalation_rules": []
+  }
+}

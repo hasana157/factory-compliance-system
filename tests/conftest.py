@@ -8,7 +8,7 @@ import pytest
 
 @pytest.fixture()
 def rules_path() -> Path:
-    return Path("src/severity/rules.json")
+    return Path("src/severity/auto_generated_rules.json")
 
 
 @pytest.fixture()

@@ -46,7 +46,7 @@ class AlertManager:
             "timestamp": violation["timestamp"],
             "severity": violation["severity"],
             "behavior_class": violation["behavior_class"],
-            "description": violation["event_description"],
+            "description": violation.get("event_description") or violation.get("description", ""),
             "zone": violation["zone"],
         }
         self.recent_alerts.insert(0, payload)

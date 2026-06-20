@@ -19,9 +19,8 @@ def generate_video(filename: str, label_text: str):
     total_frames = fps * duration
 
     # Output directory
-    output_dir = Path("samples")
-    output_dir.mkdir(exist_ok=True)
-    filepath = output_dir / filename
+    filepath = Path(filename)
+    filepath.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"Generating {filepath}...")
 
@@ -74,5 +73,5 @@ if __name__ == "__main__":
 
     print("--- GENERATING SAMPLE VIDEOS FOR DASHBOARD ---")
     for filename, label in videos.items():
-        generate_video(filename, label)
+        generate_video(f"samples/{filename}", label)
     print("\nAll done! You can find your sample videos in the './samples' directory.")

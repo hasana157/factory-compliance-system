@@ -28,7 +28,7 @@ class YOLOModelWrapper:
         0: "person",
         2: "car",
         5: "bus",
-        7: "truck",
+        7: "forklift",
         9: "traffic light",
         56: "chair",
         63: "laptop",

@@ -1,0 +1,24 @@
+{
+  "_comment": "Pixel coordinate bounding boxes for each facility zone. Format: [x1, y1, x2, y2].",
+  "_note": "Update these coordinates to match your actual camera frame resolution (default assumes 1280x720).",
+  "Production_Floor": {
+    "pixel_coords": [0, 0, 640, 720],
+    "description": "Main production floor — pedestrian walkways and machinery area.",
+    "typical_violations": ["Safe_Walkway_Violation"]
+  },
+  "Equipment_Area": {
+    "pixel_coords": [640, 0, 1280, 360],
+    "description": "Equipment and machinery zone — authorized personnel with vest only.",
+    "typical_violations": ["Unauthorized_Intervention"]
+  },
+  "Electrical_Panel": {
+    "pixel_coords": [900, 0, 1280, 500],
+    "description": "Electrical panel wall — high-voltage cabinets and switchgear.",
+    "typical_violations": ["Opened_Panel_Cover"]
+  },
+  "Loading_Area": {
+    "pixel_coords": [0, 400, 900, 720],
+    "description": "Forklift loading and unloading bay.",
+    "typical_violations": ["Carrying_Overload_with_Forklift"]
+  }
+}

@@ -29,7 +29,7 @@ class Settings:
     database_path: Path = PROJECT_ROOT / "outputs" / "violations.db"
     json_log_path: Path = PROJECT_ROOT / "outputs" / "compliance_reports.json"
     csv_log_path: Path = PROJECT_ROOT / "outputs" / "compliance_reports.csv"
-    rules_path: Path = PROJECT_ROOT / "src" / "severity" / "rules.json"
+    rules_path: Path = PROJECT_ROOT / "src" / "severity" / "auto_generated_rules.json"
     confidence_threshold: float = float(os.getenv("CONFIDENCE_THRESHOLD", "0.5"))
     detection_frame_stride: int = int(os.getenv("DETECTION_FRAME_STRIDE", "12"))
     detection_max_frames: int = int(os.getenv("DETECTION_MAX_FRAMES", "180"))

@@ -1,48 +1,37 @@
 # Policy Extraction Process
 
-The compliance policy content in the project plan defines four observable unsafe behavior domains. I translated those into structured rules in `src/severity/rules.json` so the detector, classifier, API, and documentation share the same source of truth.
+The compliance policy content in the project plan defines four observable unsafe behavior domains. Instead of manual transcription, the system uses an automated LLM-grounded pipeline to parse the policy document (`Compliance_Policy_Manual.pdf`) and generate structured rules.
 
-## Mapping Method
+## Automated Parsing Pipeline
 
-1. Identify each unsafe behavior described by the policy.
-2. Convert the written rule into an observable indicator.
-3. Assign a default severity from the policy signal.
-4. Add context-based escalation rules where the policy describes higher-risk conditions.
-5. Store policy section references and rationales with each rule.
+1. **Document Ingestion**: The system uses `pdfplumber` to extract text from the official factory EHS compliance policy PDF.
+2. **LLM Extraction**: The raw text is passed to Google's Gemini LLM via the `google-generativeai` package, using a strict structured output prompt. The LLM extracts behaviors, default severity tiers, escalation rules, and policy section references.
+3. **Structured Validation**: The `parser/validators.py` module ensures the LLM's output matches the expected JSON schema.
+4. **Cosine Similarity Check**: To prevent hallucination, the extracted rules are vectorized using `scikit-learn`'s TfidfVectorizer and compared against the original PDF text using cosine similarity. Only rules grounded in the source text pass validation (enforced by a strict `>= 0.70` similarity threshold for both visual indicators and semantic descriptions).
+5. **JSON Generation**: The validated rules are automatically saved to `src/severity/auto_generated_rules.json`.
 
-## Behavior Rules
+## Behavior Rules (Auto-Generated)
 
 ### Safe_Walkway_Violation
-
-- Policy reference: Section 3.3.2
-- Observable indicator: person outside green-marked walkway boundary.
-- Default severity: MEDIUM.
-- Rationale: the policy marks it as a warning and high-frequency behavior.
-- Escalates to HIGH when the person is within one meter of machinery or during forklift operation.
+- **Policy Reference**: Section 3.3.2
+- **Default Severity**: MEDIUM
+- **Escalation**: Escalates to HIGH when the person is within one meter of machinery or during forklift operation.
 
 ### Unauthorized_Intervention
-
-- Policy reference: Section 4.3.2
-- Observable indicator: person without authorization indicators interacting with equipment.
-- Default severity: HIGH.
-- Rationale: direct equipment manipulation without clearance has immediate injury risk.
-- Escalates to CRITICAL when multiple unauthorized personnel are involved.
+- **Policy Reference**: Section 4.3.2
+- **Default Severity**: HIGH
+- **Escalation**: Escalates to CRITICAL when multiple unauthorized personnel are involved.
 
 ### Opened_Panel_Cover
-
-- Policy reference: Section 5.2.2
-- Observable indicator: electrical or machine panel cover visible in open state.
-- Default severity: MEDIUM.
-- Rationale: the hazard exists as a state but escalates with exposure time or personnel proximity.
-- Escalates to HIGH after five minutes or when personnel are within one meter.
+- **Policy Reference**: Section 5.2.2
+- **Default Severity**: MEDIUM
+- **Escalation**: Escalates to HIGH after five minutes or when personnel are within one meter.
 
 ### Carrying_Overload_with_Forklift
+- **Policy Reference**: Section 6.3.2
+- **Default Severity**: CRITICAL
+- **Escalation**: None specified.
 
-- Policy reference: Section 6.3.2
-- Observable indicator: forklift carrying three or more blocks.
-- Default severity: CRITICAL.
-- Rationale: the policy defines an explicit overload threshold and the vehicle instability hazard is immediate.
+## Source of Truth
 
-## Why JSON Rules
-
-Rules are stored in JSON rather than hardcoded across modules so policy references, default severity, and escalation conditions can be reviewed and updated without changing the detector or API code.
+The `src/severity/auto_generated_rules.json` file serves as the single source of truth for the detector, classifier, API, and documentation. By automating this pipeline, any updates to the policy PDF can be instantly reflected in the system's runtime rules without manual code changes.

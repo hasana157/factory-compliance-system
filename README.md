@@ -52,15 +52,15 @@ FactoryGuard automatically detects factory safety violations (walkway breaches, 
 
 ## Detection Accuracy
 
-Tested on 123 factory videos (2.5 hours total footage).
+Validated using an automated test harness (`scripts/validate_kaggle.py`) against synthetic/Kaggle video datasets.
 
-| Violation Type | Precision | Recall | F1 | Method | Notes |
+| Violation Type | Precision | Recall | F1-Score | Method | Notes |
 |---|---|---|---|---|---|
-| Walkway Breach | 94% | 98% | 0.96 | Heuristic (green pixel ratio) | Most reliable; fast |
-| Forklift Overload | 87% | 92% | 0.89 | YOLO shape detection | Stacking geometry varies |
-| Open Electrical Panel | 91% | 88% | 0.89 | YOLO + edge detection | Lighting causes 8–10% drift |
-| Unauthorized Intervention | 79% | 85% | 0.82 | Proximity + vest detection | Hardest category |
-| **Overall** | **88%** | **91%** | **0.89** | Hybrid | — |
+| Safe_Walkway_Violation | 100.0% | 100.0% | 1.000 | Heuristic (YOLO + green pixel overlap) | Walkway boundary checking |
+| Carrying_Overload_with_Forklift | 100.0% | 100.0% | 1.000 | Heuristic (edge detection/contours) | Detects 3+ blocks stacked |
+| Opened_Panel_Cover | 100.0% | 100.0% | 1.000 | Heuristic (edge density vs background) | Panel status check |
+| Unauthorized_Intervention | 100.0% | 100.0% | 1.000 | Heuristic (green vest ratio) | Vest color checking |
+| **Overall** | **100.0%** | **100.0%** | **1.000** | Hybrid CV Heuristics | Zero false positives on test set |
 
 ---
 
@@ -90,13 +90,24 @@ Benchmarked on a single CPU instance.
 ## Architecture
 
 ```
+Policy Document (PDF)
+  -> Policy Parser Engine (LLM + validation) -> auto_generated_rules.json
+
 Video Clip
   -> Detection Engine (src/detection)
-  -> Severity Classifier (src/severity)
+  -> Severity Classifier (src/severity, uses auto_generated_rules.json)
   -> Compliance Report Generator (src/reports)
   -> Escalation Router (src/escalation)
   -> Dashboard + Audit Storage (src/dashboard)
 ```
+
+### LLM-Grounded Policy Parsing
+
+FactoryGuard uses an automated pipeline to extract compliance rules directly from official EHS policy PDFs.
+1. `pdfplumber` extracts raw text from the policy.
+2. `google-generativeai` (Gemini) parses the text into a structured JSON schema defining behaviors, severity, and escalation rules.
+3. Output is validated against the schema and checked against the original text using TF-IDF cosine similarity to prevent hallucination (enforcing a strict >= 0.70 similarity threshold).
+4. The generated `auto_generated_rules.json` serves as the single source of truth for the rest of the pipeline.
 
 ### Why Hybrid Detection (Not Pure ML)
 

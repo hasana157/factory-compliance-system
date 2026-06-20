@@ -7,6 +7,50 @@
   50%       { opacity: 0.70; }
 }
 
+/* ── Mandatory visual flash for HIGH and CRITICAL alerts ── */
+/* Per policy spec: system must render a visible flash/banner on HIGH+ severity */
+
+@keyframes flash-red {
+  0%   { background-color: rgba(220, 38, 38, 0.0);  }
+  15%  { background-color: rgba(220, 38, 38, 0.35); }
+  30%  { background-color: rgba(220, 38, 38, 0.0);  }
+  50%  { background-color: rgba(220, 38, 38, 0.30); }
+  65%  { background-color: rgba(220, 38, 38, 0.0);  }
+  80%  { background-color: rgba(220, 38, 38, 0.20); }
+  100% { background-color: rgba(220, 38, 38, 0.0);  }
+}
+
+@keyframes flash-orange {
+  0%   { background-color: rgba(239, 68, 68, 0.0);  }
+  20%  { background-color: rgba(239, 68, 68, 0.25); }
+  40%  { background-color: rgba(239, 68, 68, 0.0);  }
+  60%  { background-color: rgba(239, 68, 68, 0.20); }
+  80%  { background-color: rgba(239, 68, 68, 0.0);  }
+  100% { background-color: rgba(239, 68, 68, 0.0);  }
+}
+
+/* Screen-level flash overlay — injected by AlertNotification when CRITICAL */
+@keyframes screen-flash-critical {
+  0%   { opacity: 0; }
+  10%  { opacity: 0.6; }
+  25%  { opacity: 0; }
+  40%  { opacity: 0.5; }
+  55%  { opacity: 0; }
+  70%  { opacity: 0.4; }
+  85%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes screen-flash-high {
+  0%   { opacity: 0; }
+  12%  { opacity: 0.4; }
+  28%  { opacity: 0; }
+  45%  { opacity: 0.35; }
+  60%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 0 20px var(--critical-glow), 0 0 40px var(--critical-glow);
