@@ -12,6 +12,28 @@ FactoryGuard automatically detects factory safety violations (walkway breaches, 
 
 **Built with:** Python + FastAPI | React | OpenCV/YOLO | WebSockets | SQLite
 ---
+
+## Table of Contents
+
+- [Live System Gallery](#-live-system-gallery)
+- [Why This Matters](#-why-this-matters)
+- [Detection Accuracy](#detection-accuracy)
+- [Real Performance Numbers](#-real-performance-numbers)
+- [System Architecture](#%EF%B8%8F-system-architecture)
+- [Severity Classification](#severity-classification)
+- [Core Modules](#core-modules)
+- [Quick Start](#quick-start)
+- [API Endpoints](#api-endpoints)
+- [Database Schema](#database-schema)
+- [Testing](#testing)
+- [Known Limitations](#known-limitations)
+- [Roadmap](#roadmap)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Related Documentation](#related-documentation)
+- [Contributing & Support](#contributing--support)
+- [License](#license)
+
 ---
 ### Main Dashboard
 <img alt="Main Dashboard — Live feed with detection overlays and severity indicators" src="https://github.com/user-attachments/assets/d39f190e-c49d-4fea-893f-a2a5a1a49566" style="max-width:800px; width:100%; height:auto;" />
@@ -48,8 +70,12 @@ Validated using an automated test harness ([`scripts/validate_kaggle.py`](script
 | Unauthorized_Intervention | 100.0% | 100.0% | 1.000 | Heuristic (green vest ratio) | Vest color checking |
 | **Overall** | **100.0%** | **100.0%** | **1.000** | Hybrid CV Heuristics | Zero false positives on test set |
 
-> [!NOTE]
-> **Real-World Caveat:** The metrics above are measured on a controlled synthetic dataset that mimics the policy-defined behaviors. Real-factory performance may vary due to lighting, camera angles, occlusions, and environmental conditions (fog, glare, night shifts). We are actively collecting real-world footage to recalibrate our heuristics and plan to publish updated benchmarks on production data.
+> **Validation Strategy & Real-World Readiness:**
+> To validate the end-to-end system architecture — not just a single model — we developed a procedural synthetic video generator that produces policy-specific violations (walkway breaches, block overloads, panel status changes, and vest color swaps). This allows us to rigorously test the **entire pipeline** (detection → severity → escalation → storage) under controlled conditions.
+>
+> The system is engineered to accept any Full HD (1920×1080) feed. The hybrid CV/ML architecture is designed to be re-trained or fine-tuned on real factory footage as a seamless next step, ensuring the solution adapts to specific facility lighting and occlusions.
+>
+> *Note: Real-factory performance may vary due to environmental factors. The system is built with clear, modular hooks for recalibration.*
 
 ---
 
@@ -76,18 +102,58 @@ Benchmarked on a single CPU instance.
 
 ---
 
-## Architecture
+## 🏗️ System Architecture
 
-```
-Policy Document (PDF)
-  -> Policy Parser Engine (LLM + validation) -> auto_generated_rules.json
+```mermaid
+graph TD
+    %% Styling
+    classDef input fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef process fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
+    classDef storage fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    classDef output fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px;
+    classDef decision fill:#ffebee,stroke:#b71c1c,stroke-width:2px;
 
-Video Clip
-  -> Detection Engine (src/detection)
-  -> Severity Classifier (src/severity, uses auto_generated_rules.json)
-  -> Compliance Report Generator (src/reports)
-  -> Escalation Router (src/escalation)
-  -> Dashboard + Audit Storage (src/dashboard)
+    %% Nodes
+    PDF[("📄 Compliance Policy PDF")]
+    Video[("🎥 Raw Video Clips")]
+
+    Parser["🧠 LLM Parser - Gemini"]
+    Validator["✅ Schema and Similarity Validator"]
+    Rules[("⚙️ auto_generated_rules.json")]
+
+    Detector["👁️ Detection Engine<br/>Hybrid CV + YOLO"]
+    Severity["📊 Severity Classifier"]
+
+    Router{"🚨 Escalation Router"}
+    DB[("💾 Persistent Storage<br/>SQLite - JSONL - CSV")]
+    WS[("📡 WebSocket Broker")]
+
+    Dashboard["🖥️ React Dashboard"]
+    Export["📤 Export Module"]
+
+    %% Flows
+    PDF --> Parser --> Validator --> Rules
+    Video --> Detector
+
+    Rules --> Severity
+    Detector -- "Bounding Boxes and Classes" --> Severity
+
+    Severity --> Router
+    Router -- "LOW / MEDIUM" --> DB
+    Router -- "HIGH / CRITICAL" --> WS
+    Router -- "All Events - Audit" --> DB
+
+    WS -- "Real-time Push under 20ms" --> Dashboard
+    DB -- "Historical Queries" --> Dashboard
+    Dashboard -- "Filter and Download" --> Export
+    Export --> DB
+
+    %% Apply styles
+    class PDF,Video input;
+    class Parser,Validator,Detector,Severity process;
+    class Rules,DB storage;
+    class Dashboard,Export output;
+    class Router decision;
 ```
 
 ### LLM-Grounded Policy Parsing
